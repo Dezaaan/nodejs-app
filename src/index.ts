@@ -1,11 +1,13 @@
-// index.ts
-
 import { createApp } from "./app.js";
+import { createConfig } from "./config/config.js";
+import { createEnv } from "./config/env.js";
 
-const port = 3000;
+const env = createEnv();
+
+const config = createConfig(env);
 
 const app = createApp();
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+app.listen(config.app.port, () => {
+  console.log(`Server running on http://localhost:${config.app.port}`);
 });
