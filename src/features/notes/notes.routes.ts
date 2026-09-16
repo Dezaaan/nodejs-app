@@ -1,5 +1,6 @@
 import { Router } from "express";
-import type { NotesController } from "./notes.controller.js";
+import { NotesController } from "./notes.types.js";
+import { asyncHandler } from "../../shared/http/asyncHandler.js";
 
 type CreateNotesRoutesDependencies = {
   notesController: NotesController;
@@ -10,11 +11,11 @@ export const createNotesRoutes = ({
 }: CreateNotesRoutesDependencies): Router => {
   const router = Router();
 
-  router.get("/", notesController.getNotes);
+  router.get("/", asyncHandler(notesController.getNotes));
 
-  router.get("/:id", notesController.getNoteById);
+  router.get("/:id", asyncHandler(notesController.getNoteById));
 
-  router.post("/", notesController.createNote);
+  router.post("/", asyncHandler(notesController.createNote));
 
   return router;
 };

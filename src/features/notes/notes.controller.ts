@@ -17,15 +17,10 @@ export const createNotesController = ({
   const getNotes = async (
     _request: Request,
     response: Response,
-    next: NextFunction,
   ): Promise<void> => {
-    try {
-      const notes = await notesService.getNotes();
+    const notes = await notesService.getNotes();
 
-      response.status(200).json(notes);
-    } catch (error) {
-      next(error);
-    }
+    response.status(200).json(notes);
   };
 
   const getNoteById = async (
@@ -35,15 +30,8 @@ export const createNotesController = ({
   ): Promise<void> => {
     try {
       const { id } = noteIdParamsSchema.parse(request.params);
+
       const note = await notesService.getNoteById(id);
-
-      if (!note) {
-        response.status(404).json({
-          message: "Note not found",
-        });
-
-        return;
-      }
 
       response.status(200).json(note);
     } catch (error) {

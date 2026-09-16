@@ -1,3 +1,4 @@
+import { NotFoundError } from "../../shared/errors/NotFoundError.js";
 import type { NotesRepository } from "./notes.repository.js";
 import type { CreateNoteInput, Note, NotesService } from "./notes.types.js";
 
@@ -12,8 +13,14 @@ export const createNotesService = ({
     return notesRepository.findAll();
   };
 
-  const getNoteById = async (id: string): Promise<Note | null> => {
-    return notesRepository.findById(id);
+  const getNoteById = async (id: string): Promise<Note> => {
+    const note = await notesRepository.findById(id);
+
+    if (!note) {
+      throw new NotFoundError("Note not found");
+    }
+
+    return note;
   };
 
   const createNote = async (input: CreateNoteInput): Promise<Note> => {

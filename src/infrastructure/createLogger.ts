@@ -1,20 +1,19 @@
 export type Logger = {
-  log: (message: string) => void;
-  error: (message: string) => void;
+  info(message: string, meta?: unknown): void;
+  error(message: string, meta?: unknown): void;
+  warn(message: string, meta?: unknown): void;
 };
 
-export const createLogger = (logger: {
-  level: "debug" | "info" | "warn" | "error";
-}): Logger => {
-  return {
-    log: (message: string) => {
-      // TODO: implement logging
-      console.log("[LOG]", message);
-    },
-    error: (message: string) => {
-      // TODO: implement error logging
-      console.log("[LOG]", message);
-      console.log("[LOG]", logger);
-    },
-  };
-};
+export const createLogger = (): Logger => ({
+  info: (message, meta) => {
+    console.log(message, meta ?? "");
+  },
+
+  error: (message, meta) => {
+    console.error(message, meta ?? "");
+  },
+
+  warn: (message, meta) => {
+    console.warn(message, meta ?? "");
+  },
+});

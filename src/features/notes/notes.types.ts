@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { createNoteSchema, noteIdParamsSchema } from "./notes.schema.js";
-import type { NextFunction, Request, Response } from "express";
+import type {
+  NextFunction,
+  ParamsDictionary,
+  Request,
+  Response,
+} from "express-serve-static-core";
 
 export type NotesController = {
   getNotes(
@@ -16,7 +21,7 @@ export type NotesController = {
   ): Promise<void>;
 
   createNote(
-    request: Request<Record<string, never>, unknown, CreateNoteInput>,
+    request: Request<ParamsDictionary, unknown, CreateNoteInput>,
     response: Response,
     next: NextFunction,
   ): Promise<void>;
@@ -24,7 +29,7 @@ export type NotesController = {
 
 export type NotesService = {
   getNotes(): Promise<Note[]>;
-  getNoteById(id: string): Promise<Note | null>;
+  getNoteById(id: string): Promise<Note>;
   createNote(input: CreateNoteInput): Promise<Note>;
 };
 
@@ -32,6 +37,12 @@ export type NotesFeature = {
   service: NotesService;
   controller: NotesController;
 };
+
+export type CreateNoteRequest = Request<
+  ParamsDictionary,
+  unknown,
+  CreateNoteInput
+>;
 
 export type Note = {
   id: string;

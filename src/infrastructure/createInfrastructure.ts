@@ -9,7 +9,7 @@ export type Infrastructure = {
 
 export const createInfrastructure = (config: AppConfig): Infrastructure => {
   const database = createDatabase(config.database);
-  const logger = createLogger(config.logger);
+  const logger = createLogger();
 
   return {
     database,
