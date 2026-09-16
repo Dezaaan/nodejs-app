@@ -1,8 +1,8 @@
 import express from "express";
 import type { AppContainer } from "./app/container.types.js";
 import { createRoutes } from "./routes/createRoutes.js";
-import { errorMiddleware } from "./shared/errors/errorMiddleware.js";
 import { notFoundMiddleware } from "./shared/errors/notFoundMiddleware.js";
+import { createErrorMiddleware } from "./shared/errors/errorMiddleware.js";
 
 export const createApp = (container: AppContainer) => {
   const app = express();
@@ -23,7 +23,7 @@ export const createApp = (container: AppContainer) => {
   app.use("/api", createRoutes(container));
 
   app.use(notFoundMiddleware);
-  app.use(errorMiddleware);
+  app.use(createErrorMiddleware(container.infrastructure.logger));
 
   return app;
 };

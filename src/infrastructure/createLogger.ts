@@ -1,19 +1,27 @@
+export type LogMetadata = Record<string, unknown>;
+
 export type Logger = {
-  info(message: string, meta?: unknown): void;
-  error(message: string, meta?: unknown): void;
-  warn(message: string, meta?: unknown): void;
+  info(message: string, metadata?: LogMetadata): void;
+  warn(message: string, metadata?: LogMetadata): void;
+  error(message: string, metadata?: LogMetadata): void;
 };
 
-export const createLogger = (): Logger => ({
-  info: (message, meta) => {
-    console.log(message, meta ?? "");
-  },
+export const createLogger = (): Logger => {
+  const info = (message: string, metadata?: LogMetadata): void => {
+    console.log(message, metadata ?? {});
+  };
 
-  error: (message, meta) => {
-    console.error(message, meta ?? "");
-  },
+  const warn = (message: string, metadata?: LogMetadata): void => {
+    console.warn(message, metadata ?? {});
+  };
 
-  warn: (message, meta) => {
-    console.warn(message, meta ?? "");
-  },
-});
+  const error = (message: string, metadata?: LogMetadata): void => {
+    console.error(message, metadata ?? {});
+  };
+
+  return {
+    info,
+    warn,
+    error,
+  };
+};

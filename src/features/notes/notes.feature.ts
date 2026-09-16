@@ -6,17 +6,19 @@ import { createNotesService } from "./notes.service.js";
 
 type CreateNotesFeatureDependencies = {
   database: Database;
-  logger?: Logger;
+  logger: Logger;
 };
 
-export const createNotesFeature = (
-  _dependencies: CreateNotesFeatureDependencies,
-) => {
-  console.log("[LOG]", _dependencies.database);
+export const createNotesFeature = ({
+  database,
+  logger,
+}: CreateNotesFeatureDependencies) => {
+  console.log("[LOG]", database);
   const repository = createInMemoryNotesRepository();
 
   const service = createNotesService({
     notesRepository: repository,
+    logger: logger,
   });
 
   const controller = createNotesController({

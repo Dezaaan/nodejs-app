@@ -1,13 +1,10 @@
 import { AppConfig } from "../config/config.js";
-import { createDatabase, Database } from "./createDatabase.js";
-import { createLogger, Logger } from "./createLogger.js";
+import { createDatabase } from "./createDatabase.js";
+import { createLogger } from "./createLogger.js";
 
-export type Infrastructure = {
-  database: Database;
-  logger: Logger;
-};
+export type Infrastructure = ReturnType<typeof createInfrastructure>;
 
-export const createInfrastructure = (config: AppConfig): Infrastructure => {
+export const createInfrastructure = (config: AppConfig) => {
   const database = createDatabase(config.database);
   const logger = createLogger();
 

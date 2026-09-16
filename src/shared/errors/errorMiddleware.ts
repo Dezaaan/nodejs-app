@@ -1,42 +1,44 @@
-import type { ErrorRequestHandler } from "express";
-import { AppError } from "./AppError.js";
+import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
+import { Logger } from "../../infrastructure/createLogger.js";
+import { AppError } from "./AppError.js";
 
-export const errorMiddleware: ErrorRequestHandler = (
-  error,
-  _request,
-  response,
-  _next,
-) => {
-  if (error instanceof AppError) {
-    response.status(error.statusCode).json({
-      error: {
-        code: error.code,
-        message: error.message,
-      },
+export const createErrorMiddleware = (logger: Logger): ErrorRequestHandler => {
+  return (error, request, response, _next) => {
+    if (error instanceof AppError) {
+      response.status(error.statusCode).json({
+        error: {
+          code: error.code,
+          message: error.message,
+        },
+      });
+
+      return;
+    }
+
+    if (error instanceof ZodError) {
+      response.status(400).json({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Invalid request data",
+          details: error.flatten(),
+        },
+      });
+
+      return;
+    }
+
+    logger.error("Unhandled application error", {
+      method: request.method,
+      path: request.originalUrl,
+      error,
     });
 
-    return;
-  }
-
-  if (error instanceof ZodError) {
-    response.status(400).json({
+    response.status(500).json({
       error: {
-        code: "VALIDATION_ERROR",
-        message: "Invalid request data",
-        details: error.flatten(),
+        code: "INTERNAL_SERVER_ERROR",
+        message: "An unexpected error occurred",
       },
     });
-
-    return;
-  }
-
-  console.error(error);
-
-  response.status(500).json({
-    error: {
-      code: "INTERNAL_SERVER_ERROR",
-      message: "An unexpected error occurred",
-    },
-  });
+  };
 };

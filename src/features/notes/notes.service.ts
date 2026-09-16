@@ -1,13 +1,16 @@
+import { Logger } from "../../infrastructure/createLogger.js";
 import { NotFoundError } from "../../shared/errors/NotFoundError.js";
 import type { NotesRepository } from "./notes.repository.js";
 import type { CreateNoteInput, Note, NotesService } from "./notes.types.js";
 
 type CreateNotesServiceDependencies = {
   notesRepository: NotesRepository;
+  logger: Logger;
 };
 
 export const createNotesService = ({
   notesRepository,
+  logger,
 }: CreateNotesServiceDependencies): NotesService => {
   const getNotes = async (): Promise<Note[]> => {
     return notesRepository.findAll();
@@ -34,7 +37,13 @@ export const createNotesService = ({
       updatedAt: now,
     };
 
-    return notesRepository.create(note);
+    const createdNote = await notesRepository.create(note);
+
+    logger.info("Note created", {
+      noteId: createdNote.id,
+    });
+
+    return createdNote;
   };
 
   return {
