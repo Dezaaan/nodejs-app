@@ -1,16 +1,10 @@
 import { AppConfig } from "../config/config.js";
-import { NotesController } from "../features/notes/notes.controller.js";
-import { NotesRepository } from "../features/notes/notes.repository.js";
-import { NotesService } from "../features/notes/notes.service.js";
+import { createNotesFeature } from "../features/notes/notes.feature.js";
 
 export type AppContainer = {
   config: AppConfig;
 
   features: {
-    notes: {
-      repository: NotesRepository;
-      service: NotesService;
-      controller: NotesController;
-    };
+    notes: ReturnType<typeof createNotesFeature>;
   };
 };
