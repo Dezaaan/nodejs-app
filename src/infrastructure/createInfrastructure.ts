@@ -1,6 +1,6 @@
 import { AppConfig } from "../config/config.js";
-import { createDatabase } from "./createDatabase.js";
 import { createLogger } from "./createLogger.js";
+import { createDatabase } from "./database/database.js";
 
 export type Infrastructure = ReturnType<typeof createInfrastructure>;
 

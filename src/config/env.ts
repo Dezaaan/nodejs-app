@@ -7,13 +7,12 @@ const envSchema = z.object({
     .default("development"),
 
   PORT: z.coerce.number().int().positive().default(4000),
-  DB_HOST: z.string().default("localhost"),
-  DB_PORT: z.coerce.number().int().positive().default(5432),
-  DB_USERNAME: z.string().default("user"),
-  DB_PASSWORD: z.string().default("password"),
-  DB_DATABASE: z.string().default("app_db"),
 
-  LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
+  DATABASE_HOST: z.string().min(1),
+  DATABASE_PORT: z.coerce.number().int().positive().default(5432),
+  DATABASE_NAME: z.string().min(1),
+  DATABASE_USER: z.string().min(1),
+  DATABASE_PASSWORD: z.string().min(1),
 });
 
 export type Env = z.infer<typeof envSchema>;

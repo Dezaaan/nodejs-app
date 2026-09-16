@@ -5,15 +5,13 @@ export type AppConfig = {
     environment: Env["NODE_ENV"];
     port: number;
   };
+
   database: {
     host: string;
     port: number;
-    username: string;
+    name: string;
+    user: string;
     password: string;
-    database: string;
-  };
-  logger: {
-    level: "debug" | "info" | "warn" | "error";
   };
 };
 
@@ -22,14 +20,12 @@ export const createConfig = (env: Env): AppConfig => ({
     environment: env.NODE_ENV,
     port: env.PORT,
   },
+
   database: {
-    host: env.DB_HOST,
-    port: env.DB_PORT,
-    username: env.DB_USERNAME,
-    password: env.DB_PASSWORD,
-    database: env.DB_DATABASE,
-  },
-  logger: {
-    level: env.LOG_LEVEL,
+    host: env.DATABASE_HOST,
+    port: env.DATABASE_PORT,
+    name: env.DATABASE_NAME,
+    user: env.DATABASE_USER,
+    password: env.DATABASE_PASSWORD,
   },
 });
