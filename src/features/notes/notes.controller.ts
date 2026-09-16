@@ -1,26 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
-import type { NotesService } from "./notes.service.js";
-import type { CreateNoteInput } from "./notes.types.js";
-
-export type NotesController = {
-  getNotes(
-    request: Request,
-    response: Response,
-    next: NextFunction,
-  ): Promise<void>;
-
-  getNoteById(
-    request: Request,
-    response: Response,
-    next: NextFunction,
-  ): Promise<void>;
-
-  createNote(
-    request: Request,
-    response: Response,
-    next: NextFunction,
-  ): Promise<void>;
-};
+import type {
+  CreateNoteInput,
+  NoteIdParams,
+  NotesController,
+  NotesService,
+} from "./notes.types.js";
+import { createNoteSchema, noteIdParamsSchema } from "./notes.schema.js";
 
 type CreateNotesControllerDependencies = {
   notesService: NotesService;
@@ -44,12 +29,13 @@ export const createNotesController = ({
   };
 
   const getNoteById = async (
-    request: Request,
+    request: Request<NoteIdParams>,
     response: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const note = await notesService.getNoteById(request.params.id);
+      const { id } = noteIdParamsSchema.parse(request.params);
+      const note = await notesService.getNoteById(id);
 
       if (!note) {
         response.status(404).json({
@@ -71,7 +57,8 @@ export const createNotesController = ({
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const note = await notesService.createNote(request.body);
+      const input = createNoteSchema.parse(request.body);
+      const note = await notesService.createNote(input);
 
       response.status(201).json(note);
     } catch (error) {

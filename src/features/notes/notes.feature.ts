@@ -1,12 +1,8 @@
-import { Database, Logger } from "../../infrastructure/createInfrastructure.js";
-import { createNotesController, NotesController } from "./notes.controller.js";
+import { Database } from "../../infrastructure/createDatabase.js";
+import { Logger } from "../../infrastructure/createLogger.js";
+import { createNotesController } from "./notes.controller.js";
 import { createInMemoryNotesRepository } from "./notes.repository.memory.js";
-import { createNotesService, NotesService } from "./notes.service.js";
-
-export type NotesFeature = {
-  service: NotesService;
-  controller: NotesController;
-};
+import { createNotesService } from "./notes.service.js";
 
 type CreateNotesFeatureDependencies = {
   database: Database;

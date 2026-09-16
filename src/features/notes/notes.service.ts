@@ -1,11 +1,5 @@
 import type { NotesRepository } from "./notes.repository.js";
-import type { CreateNoteInput, Note } from "./notes.types.js";
-
-export type NotesService = {
-  getNotes(): Promise<Note[]>;
-  getNoteById(id: string): Promise<Note | null>;
-  createNote(input: CreateNoteInput): Promise<Note>;
-};
+import type { CreateNoteInput, Note, NotesService } from "./notes.types.js";
 
 type CreateNotesServiceDependencies = {
   notesRepository: NotesRepository;

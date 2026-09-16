@@ -1,14 +1,6 @@
 import { AppConfig } from "../config/config.js";
-
-export type Database = {
-  connect: () => Promise<void>;
-  disconnect: () => Promise<void>;
-};
-
-export type Logger = {
-  log: (message: string) => void;
-  error: (message: string) => void;
-};
+import { createDatabase, Database } from "./createDatabase.js";
+import { createLogger, Logger } from "./createLogger.js";
 
 export type Infrastructure = {
   database: Database;
@@ -24,38 +16,3 @@ export const createInfrastructure = (config: AppConfig): Infrastructure => {
     logger,
   };
 };
-
-function createDatabase(database: {
-  host: string;
-  port: number;
-  username: string;
-  password: string;
-  database: string;
-}): Database {
-  return {
-    connect: async () => {
-      // TODO: implement database connection
-      console.log("[LOG]", database);
-    },
-    disconnect: async () => {
-      // TODO: implement database disconnection
-      console.log("[LOG]", database);
-    },
-  };
-}
-
-function createLogger(logger: {
-  level: "debug" | "info" | "warn" | "error";
-}): Logger {
-  return {
-    log: (message: string) => {
-      // TODO: implement logging
-      console.log("[LOG]", message);
-    },
-    error: (message: string) => {
-      // TODO: implement error logging
-      console.log("[LOG]", message);
-      console.log("[LOG]", logger);
-    },
-  };
-}
