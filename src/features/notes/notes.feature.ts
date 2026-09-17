@@ -1,7 +1,7 @@
-import { Database } from "../../infrastructure/createDatabase.js";
 import { Logger } from "../../infrastructure/createLogger.js";
+import { Database } from "../../infrastructure/database/database.types.js";
 import { createNotesController } from "./notes.controller.js";
-import { createInMemoryNotesRepository } from "./notes.repository.memory.js";
+import { createPostgresNotesRepository } from "./notes.repository.postgres.js";
 import { createNotesService } from "./notes.service.js";
 
 type CreateNotesFeatureDependencies = {
@@ -14,7 +14,9 @@ export const createNotesFeature = ({
   logger,
 }: CreateNotesFeatureDependencies) => {
   console.log("[LOG]", database);
-  const repository = createInMemoryNotesRepository();
+  const repository = createPostgresNotesRepository({
+    database,
+  });
 
   const service = createNotesService({
     notesRepository: repository,

@@ -7,11 +7,7 @@ export type AppConfig = {
   };
 
   database: {
-    host: string;
-    port: number;
-    name: string;
-    user: string;
-    password: string;
+    url: string;
   };
 };
 
@@ -22,10 +18,6 @@ export const createConfig = (env: Env): AppConfig => ({
   },
 
   database: {
-    host: env.DATABASE_HOST,
-    port: env.DATABASE_PORT,
-    name: env.DATABASE_NAME,
-    user: env.DATABASE_USER,
-    password: env.DATABASE_PASSWORD,
+    url: env.DATABASE_URL,
   },
 });

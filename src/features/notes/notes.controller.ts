@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
 import type {
   CreateNoteInput,
   NoteIdParams,
@@ -26,32 +26,23 @@ export const createNotesController = ({
   const getNoteById = async (
     request: Request<NoteIdParams>,
     response: Response,
-    next: NextFunction,
   ): Promise<void> => {
-    try {
-      const { id } = noteIdParamsSchema.parse(request.params);
+    const { id } = noteIdParamsSchema.parse(request.params);
 
-      const note = await notesService.getNoteById(id);
+    const note = await notesService.getNoteById(id);
 
-      response.status(200).json(note);
-    } catch (error) {
-      next(error);
-    }
+    response.status(200).json(note);
   };
 
   const createNote = async (
     request: Request<Record<string, never>, unknown, CreateNoteInput>,
     response: Response,
-    next: NextFunction,
   ): Promise<void> => {
-    try {
-      const input = createNoteSchema.parse(request.body);
-      const note = await notesService.createNote(input);
+    const input = createNoteSchema.parse(request.body);
 
-      response.status(201).json(note);
-    } catch (error) {
-      next(error);
-    }
+    const note = await notesService.createNote(input);
+
+    response.status(201).json(note);
   };
 
   return {
