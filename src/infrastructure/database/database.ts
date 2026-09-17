@@ -13,6 +13,10 @@ export const createDatabase = (config: AppConfig["database"]): Database => {
 
     connect: () => pool.connect(),
 
+    healthCheck: async () => {
+      await pool.query("SELECT 1");
+    },
+
     close: () => pool.end(),
   };
 };

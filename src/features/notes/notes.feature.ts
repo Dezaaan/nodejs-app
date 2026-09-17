@@ -13,7 +13,6 @@ export const createNotesFeature = ({
   database,
   logger,
 }: CreateNotesFeatureDependencies) => {
-  console.log("[LOG]", database);
   const repository = createPostgresNotesRepository({
     database,
   });

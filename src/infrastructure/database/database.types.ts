@@ -8,5 +8,7 @@ export type Database = {
 
   connect(): Promise<PoolClient>;
 
+  healthCheck(): Promise<void>;
+
   close(): Promise<void>;
 };
