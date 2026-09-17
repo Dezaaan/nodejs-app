@@ -8,7 +8,13 @@ const envSchema = z.object({
 
   PORT: z.coerce.number().int().positive().default(4000),
 
-  DATABASE_URL: z.string().url(),
+  DATABASE_URL: z
+    .string()
+    .refine(
+      (value) =>
+        value.startsWith("postgres://") || value.startsWith("postgresql://"),
+      "DATABASE_URL must be a PostgreSQL connection string",
+    ),
 });
 
 export type Env = z.infer<typeof envSchema>;

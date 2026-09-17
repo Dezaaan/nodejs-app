@@ -52,5 +52,11 @@ export type Note = {
   updatedAt: Date;
 };
 
+//TODO this needs to be updated
+export type NoteRow = Pick<Note, "id" | "title" | "content"> & {
+  created_at: Date;
+  updated_at: Date;
+};
+
 export type CreateNoteInput = z.infer<typeof createNoteSchema>;
 export type NoteIdParams = z.infer<typeof noteIdParamsSchema>;

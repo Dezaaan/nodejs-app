@@ -6,6 +6,7 @@ import { createEnv } from "./config/env.js";
 const start = async (): Promise<void> => {
   const env = createEnv();
   const config = createConfig(env);
+
   const container = createContainer(config);
 
   await container.infrastructure.database.healthCheck();

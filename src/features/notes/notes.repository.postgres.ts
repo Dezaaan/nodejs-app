@@ -1,14 +1,6 @@
 import type { Database } from "../../infrastructure/database/database.types.js";
 import type { NotesRepository } from "./notes.repository.js";
-import type { Note } from "./notes.types.js";
-
-type NoteRow = {
-  id: string;
-  title: string;
-  content: string;
-  created_at: Date;
-  updated_at: Date;
-};
+import type { Note, NoteRow } from "./notes.types.js";
 
 type CreatePostgresNotesRepositoryDependencies = {
   database: Database;
