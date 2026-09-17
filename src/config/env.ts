@@ -15,6 +15,7 @@ const envSchema = z.object({
         value.startsWith("postgres://") || value.startsWith("postgresql://"),
       "DATABASE_URL must be a PostgreSQL connection string",
     ),
+  CLIENT_ORIGIN: z.string().url(),
 });
 
 export type Env = z.infer<typeof envSchema>;

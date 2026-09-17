@@ -1,11 +1,21 @@
+import cors from "cors";
 import express from "express";
+import helmet from "helmet";
 import type { AppContainer } from "./app/container.types.js";
+import { createErrorMiddleware } from "./shared/errors/errorMiddleware.js";
 import { createRoutes } from "./routes/createRoutes.js";
 import { notFoundMiddleware } from "./shared/errors/notFoundMiddleware.js";
-import { createErrorMiddleware } from "./shared/errors/errorMiddleware.js";
 
 export const createApp = (container: AppContainer) => {
   const app = express();
+
+  app.use(helmet());
+
+  app.use(
+    cors({
+      origin: container.config.cors.origin,
+    }),
+  );
 
   app.use((request, response, next) => {
     console.log("Incoming request:", request.method, request.url);

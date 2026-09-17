@@ -5,9 +5,11 @@ export type AppConfig = {
     environment: Env["NODE_ENV"];
     port: number;
   };
-
   database: {
     url: string;
+  };
+  cors: {
+    origin: string;
   };
 };
 
@@ -16,8 +18,10 @@ export const createConfig = (env: Env): AppConfig => ({
     environment: env.NODE_ENV,
     port: env.PORT,
   },
-
   database: {
     url: env.DATABASE_URL,
+  },
+  cors: {
+    origin: env.CLIENT_ORIGIN,
   },
 });
