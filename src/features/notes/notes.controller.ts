@@ -2,48 +2,31 @@ import type { Request, Response } from "express";
 
 import {
   CreateNoteInput,
-  createNoteSchema,
   NoteIdParams,
-  noteIdParamsSchema,
-  NotesQuery,
-  notesQuerySchema,
   UpdateNoteInput,
-  updateNoteSchema,
 } from "./notes.schema.js";
-import type { NextFunction, ParamsDictionary } from "express-serve-static-core";
-import {
-  mapNotesQueryToOptions,
-  mapNoteToResponseDto,
-} from "./notes.mapper.js";
-import { mapPaginatedResult } from "../../shared/mapping/mapPaginatedResult.js";
+import type { NextFunction } from "express-serve-static-core";
+import { mapNoteToResponseDto } from "./notes.mapper.js";
 import { NotesService } from "./notes.service.js";
+import { NotesQueryOptions } from "./notes.types.js";
+import {
+  getValidatedBody,
+  getValidatedParams,
+  getValidatedQuery,
+} from "../../shared/validation/validatedRequest.js";
+
+type ControllerHandler = (
+  request: Request,
+  response: Response,
+  next: NextFunction,
+) => Promise<void>;
 
 export type NotesController = {
-  getNotes(
-    request: Request<ParamsDictionary, unknown, unknown, NotesQuery>,
-    response: Response,
-    next: NextFunction,
-  ): Promise<void>;
-  getNoteById(
-    request: Request<NoteIdParams>,
-    response: Response,
-    next: NextFunction,
-  ): Promise<void>;
-  createNote(
-    request: Request<ParamsDictionary, unknown, CreateNoteInput>,
-    response: Response,
-    next: NextFunction,
-  ): Promise<void>;
-  updateNote(
-    request: Request<NoteIdParams, unknown, UpdateNoteInput>,
-    response: Response,
-    next: NextFunction,
-  ): Promise<void>;
-  deleteNote(
-    request: Request<NoteIdParams>,
-    response: Response,
-    next: NextFunction,
-  ): Promise<void>;
+  getNotes: ControllerHandler;
+  getNoteById: ControllerHandler;
+  createNote: ControllerHandler;
+  updateNote: ControllerHandler;
+  deleteNote: ControllerHandler;
 };
 
 type CreateNotesControllerDependencies = {
@@ -54,60 +37,54 @@ export const createNotesController = ({
   notesService,
 }: CreateNotesControllerDependencies): NotesController => {
   const getNotes = async (
-    request: Request<ParamsDictionary, unknown, unknown, NotesQuery>,
+    request: Request,
     response: Response,
   ): Promise<void> => {
-    const query = notesQuerySchema.parse(request.query);
+    const query = getValidatedQuery<NotesQueryOptions>(request);
 
-    const options = mapNotesQueryToOptions(query);
+    const result = await notesService.getNotes(query);
 
-    const result = await notesService.getNotes(options);
-
-    const responseDto = mapPaginatedResult(result, mapNoteToResponseDto);
-
-    response.status(200).json(responseDto);
+    response.status(200).json(result);
   };
 
   const getNoteById = async (
-    request: Request<NoteIdParams>,
+    request: Request,
     response: Response,
   ): Promise<void> => {
-    const { id } = noteIdParamsSchema.parse(request.params);
-
+    const { id } = getValidatedParams<NoteIdParams>(request);
     const note = await notesService.getNoteById(id);
 
     response.status(200).json(mapNoteToResponseDto(note));
   };
 
   const createNote = async (
-    request: Request<Record<string, never>, unknown, CreateNoteInput>,
+    request: Request,
     response: Response,
   ): Promise<void> => {
-    const input = createNoteSchema.parse(request.body);
+    const body = getValidatedBody<CreateNoteInput>(request);
 
-    const note = await notesService.createNote(input);
+    const note = await notesService.createNote(body);
 
     response.status(201).json(mapNoteToResponseDto(note));
   };
 
   const updateNote = async (
-    request: Request<NoteIdParams, unknown, UpdateNoteInput>,
+    request: Request,
     response: Response,
   ): Promise<void> => {
-    const { id } = noteIdParamsSchema.parse(request.params);
+    const { id } = getValidatedParams<NoteIdParams>(request);
+    const body = getValidatedBody<UpdateNoteInput>(request);
 
-    const input = updateNoteSchema.parse(request.body);
-    const note = await notesService.updateNote(id, input);
+    const note = await notesService.updateNote(id, body);
 
     response.status(200).json(mapNoteToResponseDto(note));
   };
 
   const deleteNote = async (
-    request: Request<NoteIdParams>,
+    request: Request,
     response: Response,
   ): Promise<void> => {
-    const { id } = noteIdParamsSchema.parse(request.params);
-
+    const { id } = getValidatedParams<NoteIdParams>(request);
     await notesService.deleteNote(id);
 
     response.status(204).send();

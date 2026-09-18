@@ -28,7 +28,7 @@ export const createApp = (container: AppContainer) => {
     }),
   );
 
-  app.use((request, response, next) => {
+  app.use((request, _response, next) => {
     console.log("Incoming request:", request.method, request.url);
     next();
   });
