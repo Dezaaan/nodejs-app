@@ -7,6 +7,11 @@ export const createNoteSchema = z
   })
   .strict();
 
+export const updateNoteSchema = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
+});
+
 export const noteIdParamsSchema = z.object({
   id: z.uuid(),
 });

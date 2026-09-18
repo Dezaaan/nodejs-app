@@ -1,7 +1,12 @@
 import { Logger } from "../../infrastructure/createLogger.js";
 import { NotFoundError } from "../../shared/errors/NotFoundError.js";
-import type { NotesRepository } from "./notes.repository.js";
-import type { CreateNoteInput, Note, NotesService } from "./notes.types.js";
+import type {
+  CreateNoteInput,
+  Note,
+  NotesRepository,
+  NotesService,
+  UpdateNoteInput,
+} from "./notes.types.js";
 
 type CreateNotesServiceDependencies = {
   notesRepository: NotesRepository;
@@ -46,9 +51,45 @@ export const createNotesService = ({
     return createdNote;
   };
 
+  const updateNote = async (
+    id: string,
+    input: UpdateNoteInput,
+  ): Promise<Note> => {
+    const updatedNote = await notesRepository.update({
+      id,
+      title: input.title,
+      content: input.content,
+      updatedAt: new Date(),
+    });
+
+    if (!updatedNote) {
+      throw new NotFoundError("Note not found");
+    }
+
+    logger.info("Note updated", {
+      noteId: updatedNote.id,
+    });
+
+    return updatedNote;
+  };
+
+  const deleteNote = async (id: string): Promise<void> => {
+    const deleted = await notesRepository.deleteById(id);
+
+    if (!deleted) {
+      throw new NotFoundError("Note not found");
+    }
+
+    logger.info("Note deleted", {
+      noteId: id,
+    });
+  };
+
   return {
-    getNotes,
-    getNoteById,
     createNote,
+    deleteNote,
+    getNoteById,
+    getNotes,
+    updateNote,
   };
 };

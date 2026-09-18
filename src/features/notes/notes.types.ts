@@ -13,14 +13,22 @@ export type NotesController = {
     response: Response,
     next: NextFunction,
   ): Promise<void>;
-
   getNoteById(
     request: Request,
     response: Response,
     next: NextFunction,
   ): Promise<void>;
-
   createNote(
+    request: Request<ParamsDictionary, unknown, CreateNoteInput>,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void>;
+  updateNote(
+    request: Request<ParamsDictionary, unknown, CreateNoteInput>,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void>;
+  deleteNote(
     request: Request<ParamsDictionary, unknown, CreateNoteInput>,
     response: Response,
     next: NextFunction,
@@ -28,9 +36,19 @@ export type NotesController = {
 };
 
 export type NotesService = {
-  getNotes(): Promise<Note[]>;
-  getNoteById(id: string): Promise<Note>;
   createNote(input: CreateNoteInput): Promise<Note>;
+  deleteNote: (id: string) => Promise<void>;
+  getNoteById(id: string): Promise<Note>;
+  getNotes(): Promise<Note[]>;
+  updateNote: (id: string, input: UpdateNoteInput) => Promise<Note>;
+};
+
+export type NotesRepository = {
+  create(note: Note): Promise<Note>;
+  deleteById: (id: string) => Promise<boolean>;
+  findAll(): Promise<Note[]>;
+  findById(id: string): Promise<Note | null>;
+  update: (note: UpdateNoteData) => Promise<Note | null>;
 };
 
 export type NotesFeature = {
@@ -52,7 +70,6 @@ export type Note = {
   updatedAt: Date;
 };
 
-//TODO this needs to be updated
 export type NoteRow = Pick<Note, "id" | "title" | "content"> & {
   created_at: Date;
   updated_at: Date;
@@ -60,3 +77,5 @@ export type NoteRow = Pick<Note, "id" | "title" | "content"> & {
 
 export type CreateNoteInput = z.infer<typeof createNoteSchema>;
 export type NoteIdParams = z.infer<typeof noteIdParamsSchema>;
+export type UpdateNoteInput = Pick<Note, "title" | "content">;
+export type UpdateNoteData = Omit<Note, "createdAt">;

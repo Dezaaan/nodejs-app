@@ -1,12 +1,14 @@
-import { NotesRepository } from "../../features/notes/notes.repository.js";
 import { createNotesService } from "../../features/notes/notes.service.js";
+import { NotesRepository } from "../../features/notes/notes.types.js";
 import { createTestLogger } from "../helpers/createTestLogger.js";
 import { describe, expect, it, vi } from "vitest";
 
 const createTestRepository = (): NotesRepository => ({
+  create: vi.fn(),
+  delete: vi.fn(),
   findAll: vi.fn(),
   findById: vi.fn(),
-  create: vi.fn(),
+  update: vi.fn(),
 });
 
 describe("NotesService", () => {
