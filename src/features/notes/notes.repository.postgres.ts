@@ -1,7 +1,9 @@
 import type { Database } from "../../infrastructure/database/database.types.js";
+import { mapNoteRowToDomain } from "./notes.mapper.js";
 import type {
   Note,
   NoteRow,
+  NotesQueryOptions,
   NotesRepository,
   UpdateNoteData,
 } from "./notes.types.js";
@@ -18,24 +20,88 @@ const mapNoteRow = (row: NoteRow): Note => ({
   updatedAt: row.updated_at,
 });
 
+const sortColumnMap = {
+  createdAt: "created_at",
+  updatedAt: "updated_at",
+  title: "title",
+} as const;
+
 export const createPostgresNotesRepository = ({
   database,
 }: CreatePostgresNotesRepositoryDependencies): NotesRepository => {
-  const findAll = async (): Promise<Note[]> => {
-    const result = await database.query<NoteRow>(
+  const findPaginated = async (options: NotesQueryOptions) => {
+    const offset = (options.page - 1) * options.pageSize;
+
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+
+    if (options.search) {
+      params.push(`%${options.search}%`);
+
+      const parameterIndex = params.length;
+
+      conditions.push(
+        `(
+          title ILIKE $${parameterIndex}
+          OR content ILIKE $${parameterIndex}
+        )`,
+      );
+    }
+
+    if (options.title) {
+      params.push(`%${options.title}%`);
+
+      conditions.push(`title ILIKE $${params.length}`);
+    }
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const sortColumn = sortColumnMap[options.sortBy];
+
+    const sortOrder = options.sortOrder === "asc" ? "ASC" : "DESC";
+
+    params.push(options.pageSize);
+    const limitIndex = params.length;
+
+    params.push(offset);
+    const offsetIndex = params.length;
+
+    const notesResult = await database.query<NoteRow>(
       `
-        SELECT
-          id,
-          title,
-          content,
-          created_at,
-          updated_at
-        FROM notes
-        ORDER BY created_at DESC
-      `,
+          SELECT
+            id,
+            title,
+            content,
+            created_at,
+            updated_at
+          FROM notes
+          ${whereClause}
+          ORDER BY ${sortColumn} ${sortOrder}
+          LIMIT $${limitIndex}
+          OFFSET $${offsetIndex}
+        `,
+      params,
     );
 
-    return result.rows.map(mapNoteRow);
+    const countParams = params.slice(0, -2);
+
+    const countResult = await database.query<{
+      count: string;
+    }>(
+      `
+          SELECT COUNT(*) AS count
+          FROM notes
+          ${whereClause}
+        `,
+      countParams,
+    );
+
+    return {
+      items: notesResult.rows.map(mapNoteRowToDomain),
+
+      totalItems: Number(countResult.rows[0]?.count ?? 0),
+    };
   };
 
   const findById = async (id: string): Promise<Note | null> => {
@@ -121,7 +187,7 @@ export const createPostgresNotesRepository = ({
   return {
     create,
     deleteById,
-    findAll,
+    findPaginated,
     findById,
     update,
   };

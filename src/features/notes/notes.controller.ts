@@ -9,8 +9,13 @@ import type {
 import {
   createNoteSchema,
   noteIdParamsSchema,
+  NotesQuery,
+  notesQuerySchema,
   updateNoteSchema,
 } from "./notes.schema.js";
+import type { ParamsDictionary } from "express-serve-static-core";
+import { mapNoteToResponseDto } from "./notes.mapper.js";
+import { mapPaginatedResult } from "../../shared/mapping/mapPaginatedResult.js";
 
 type CreateNotesControllerDependencies = {
   notesService: NotesService;
@@ -20,12 +25,16 @@ export const createNotesController = ({
   notesService,
 }: CreateNotesControllerDependencies): NotesController => {
   const getNotes = async (
-    _request: Request,
+    request: Request<ParamsDictionary, unknown, unknown, NotesQuery>,
     response: Response,
   ): Promise<void> => {
-    const notes = await notesService.getNotes();
+    const query = notesQuerySchema.parse(request.query);
 
-    response.status(200).json(notes);
+    const result = await notesService.getNotes(query);
+
+    const responseDto = mapPaginatedResult(result, mapNoteToResponseDto);
+
+    response.status(200).json(responseDto);
   };
 
   const getNoteById = async (
@@ -35,8 +44,7 @@ export const createNotesController = ({
     const { id } = noteIdParamsSchema.parse(request.params);
 
     const note = await notesService.getNoteById(id);
-
-    response.status(200).json(note);
+    response.status(200).json(mapNoteToResponseDto(note));
   };
 
   const createNote = async (
@@ -47,7 +55,7 @@ export const createNotesController = ({
 
     const note = await notesService.createNote(input);
 
-    response.status(201).json(note);
+    response.status(201).json(mapNoteToResponseDto(note));
   };
 
   const updateNote = async (
@@ -58,8 +66,7 @@ export const createNotesController = ({
     const input = updateNoteSchema.parse(request.body);
 
     const note = await notesService.updateNote(id, input);
-
-    response.status(200).json(note);
+    response.status(201).json(mapNoteToResponseDto(note));
   };
 
   const deleteNote = async (

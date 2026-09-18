@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 const createTestRepository = (): NotesRepository => ({
   create: vi.fn(),
   delete: vi.fn(),
-  findAll: vi.fn(),
+  fingPaginated: vi.fn(),
   findById: vi.fn(),
   update: vi.fn(),
 });
@@ -26,7 +26,7 @@ describe("NotesService", () => {
       },
     ];
 
-    vi.mocked(repository.findAll).mockResolvedValue(notes);
+    vi.mocked(repository.fingPaginated).mockResolvedValue(notes);
 
     const service = createNotesService({
       notesRepository: repository,
@@ -36,7 +36,7 @@ describe("NotesService", () => {
     const result = await service.getNotes();
 
     expect(result).toEqual(notes);
-    expect(repository.findAll).toHaveBeenCalledOnce();
+    expect(repository.fingPaginated).toHaveBeenCalledOnce();
   });
   it("throws NotFoundError when note does not exist", async () => {
     const repository = createTestRepository();

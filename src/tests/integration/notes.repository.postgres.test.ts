@@ -58,7 +58,7 @@ describe("PostgresNotesRepository", () => {
       updatedAt: now,
     });
 
-    const notes = await repository.findAll();
+    const notes = await repository.fingPaginated();
 
     expect(notes).toHaveLength(2);
   });

@@ -1,8 +1,11 @@
 import { Logger } from "../../infrastructure/createLogger.js";
 import { NotFoundError } from "../../shared/errors/NotFoundError.js";
+import { createPaginatedResult } from "../../shared/pagination/createPaginatedResult.js";
+import { PaginatedResult } from "../../shared/pagination/pagination.types.js";
 import type {
   CreateNoteInput,
   Note,
+  NotesQueryOptions,
   NotesRepository,
   NotesService,
   UpdateNoteInput,
@@ -17,10 +20,20 @@ export const createNotesService = ({
   notesRepository,
   logger,
 }: CreateNotesServiceDependencies): NotesService => {
-  const getNotes = async (): Promise<Note[]> => {
-    return notesRepository.findAll();
-  };
+  const getNotes = async (
+    options: NotesQueryOptions,
+  ): Promise<PaginatedResult<Note>> => {
+    const { items, totalItems } = await notesRepository.findPaginated(options);
 
+    return createPaginatedResult({
+      items,
+      totalItems,
+      pagination: {
+        page: options.page,
+        pageSize: options.pageSize,
+      },
+    });
+  };
   const getNoteById = async (id: string): Promise<Note> => {
     const note = await notesRepository.findById(id);
 

@@ -1,20 +1,28 @@
 import { z } from "zod";
-import { createNoteSchema, noteIdParamsSchema } from "./notes.schema.js";
+import {
+  createNoteSchema,
+  noteIdParamsSchema,
+  NotesQuery,
+} from "./notes.schema.js";
 import type {
   NextFunction,
   ParamsDictionary,
   Request,
   Response,
 } from "express-serve-static-core";
+import {
+  PaginatedResult,
+  PaginationOptions,
+} from "../../shared/pagination/pagination.types.js";
 
 export type NotesController = {
   getNotes(
-    request: Request,
+    request: Request<ParamsDictionary, unknown, unknown, NotesQuery>,
     response: Response,
     next: NextFunction,
   ): Promise<void>;
   getNoteById(
-    request: Request,
+    request: Request<NoteIdParams>,
     response: Response,
     next: NextFunction,
   ): Promise<void>;
@@ -39,14 +47,17 @@ export type NotesService = {
   createNote(input: CreateNoteInput): Promise<Note>;
   deleteNote: (id: string) => Promise<void>;
   getNoteById(id: string): Promise<Note>;
-  getNotes(): Promise<Note[]>;
+  getNotes(options: PaginationOptions): Promise<PaginatedResult<Note>>;
   updateNote: (id: string, input: UpdateNoteInput) => Promise<Note>;
 };
 
 export type NotesRepository = {
   create(note: Note): Promise<Note>;
   deleteById: (id: string) => Promise<boolean>;
-  findAll(): Promise<Note[]>;
+  findPaginated(options: NotesQueryOptions): Promise<{
+    items: Note[];
+    totalItems: number;
+  }>;
   findById(id: string): Promise<Note | null>;
   update: (note: UpdateNoteData) => Promise<Note | null>;
 };
@@ -75,7 +86,27 @@ export type NoteRow = Pick<Note, "id" | "title" | "content"> & {
   updated_at: Date;
 };
 
+export type NoteResponseDto = Pick<Note, "id" | "title" | "content"> & {
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type CreateNoteInput = z.infer<typeof createNoteSchema>;
 export type NoteIdParams = z.infer<typeof noteIdParamsSchema>;
 export type UpdateNoteInput = Pick<Note, "title" | "content">;
 export type UpdateNoteData = Omit<Note, "createdAt">;
+
+export type NotesSortField = "createdAt" | "updatedAt" | "title";
+
+export type SortOrder = "asc" | "desc";
+
+export type NotesQueryOptions = {
+  page: number;
+  pageSize: number;
+
+  search?: string;
+  title?: string;
+
+  sortBy: NotesSortField;
+  sortOrder: SortOrder;
+};
