@@ -1,15 +1,22 @@
+import type { Note, NotesQueryOptions } from "./notes.types.js";
+import { CreateNoteInput, UpdateNoteInput } from "./notes.schema.js";
 import { Logger } from "../../infrastructure/createLogger.js";
 import { NotFoundError } from "../../shared/errors/NotFoundError.js";
-import { createPaginatedResult } from "../../shared/pagination/createPaginatedResult.js";
+import { NotesRepository } from "./notes.repository.js";
 import { PaginatedResult } from "../../shared/pagination/pagination.types.js";
-import type {
-  CreateNoteInput,
-  Note,
-  NotesQueryOptions,
-  NotesRepository,
-  NotesService,
-  UpdateNoteInput,
-} from "./notes.types.js";
+import { createPaginatedResult } from "../../shared/pagination/createPaginatedResult.js";
+
+export type NotesService = {
+  createNote(input: CreateNoteInput): Promise<Note>;
+
+  deleteNote(id: string): Promise<void>;
+
+  getNoteById(id: string): Promise<Note>;
+
+  getNotes(options: NotesQueryOptions): Promise<PaginatedResult<Note>>;
+
+  updateNote(id: string, input: UpdateNoteInput): Promise<Note>;
+};
 
 type CreateNotesServiceDependencies = {
   notesRepository: NotesRepository;
@@ -23,7 +30,7 @@ export const createNotesService = ({
   const getNotes = async (
     options: NotesQueryOptions,
   ): Promise<PaginatedResult<Note>> => {
-    const { items, totalItems } = await notesRepository.findPaginated(options);
+    const { items, totalItems } = await notesRepository.findMany(options);
 
     return createPaginatedResult({
       items,

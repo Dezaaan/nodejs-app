@@ -1,12 +1,12 @@
 import type { Database } from "../../infrastructure/database/database.types.js";
 import { mapNoteRowToDomain } from "./notes.mapper.js";
-import type {
-  Note,
-  NoteRow,
-  NotesQueryOptions,
-  NotesRepository,
-  UpdateNoteData,
-} from "./notes.types.js";
+import { NotesRepository } from "./notes.repository.js";
+import type { Note, NotesQueryOptions, UpdateNoteData } from "./notes.types.js";
+
+export type NoteRow = Pick<Note, "id" | "title" | "content"> & {
+  created_at: Date;
+  updated_at: Date;
+};
 
 type CreatePostgresNotesRepositoryDependencies = {
   database: Database;
@@ -29,7 +29,7 @@ const sortColumnMap = {
 export const createPostgresNotesRepository = ({
   database,
 }: CreatePostgresNotesRepositoryDependencies): NotesRepository => {
-  const findPaginated = async (options: NotesQueryOptions) => {
+  const findMany = async (options: NotesQueryOptions) => {
     const offset = (options.page - 1) * options.pageSize;
 
     const conditions: string[] = [];
@@ -187,7 +187,7 @@ export const createPostgresNotesRepository = ({
   return {
     create,
     deleteById,
-    findPaginated,
+    findMany,
     findById,
     update,
   };

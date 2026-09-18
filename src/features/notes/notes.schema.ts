@@ -25,4 +25,10 @@ export const notesQuerySchema = z.object({
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
 
+export type CreateNoteInput = z.infer<typeof createNoteSchema>;
+
+export type UpdateNoteInput = z.infer<typeof updateNoteSchema>;
+
+export type NoteIdParams = z.infer<typeof noteIdParamsSchema>;
+
 export type NotesQuery = z.infer<typeof notesQuerySchema>;
