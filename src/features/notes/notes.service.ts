@@ -9,13 +9,13 @@ import { createPaginatedResult } from "../../shared/pagination/createPaginatedRe
 export type NotesService = {
   createNote(input: CreateNoteInput): Promise<Note>;
 
-  deleteNote(id: string): Promise<void>;
+  getNotes(options: NotesQueryOptions): Promise<PaginatedResult<Note>>;
 
   getNoteById(id: string): Promise<Note>;
 
-  getNotes(options: NotesQueryOptions): Promise<PaginatedResult<Note>>;
-
   updateNote(id: string, input: UpdateNoteInput): Promise<Note>;
+
+  deleteNote(id: string): Promise<void>;
 };
 
 type CreateNotesServiceDependencies = {
@@ -75,10 +75,16 @@ export const createNotesService = ({
     id: string,
     input: UpdateNoteInput,
   ): Promise<Note> => {
+    const existingNote = await notesRepository.findById(id);
+
+    if (!existingNote) {
+      throw new NotFoundError("Note not found");
+    }
+
     const updatedNote = await notesRepository.update({
       id,
-      title: input.title,
-      content: input.content,
+      title: input.title ?? existingNote.title,
+      content: input.content ?? existingNote.content,
       updatedAt: new Date(),
     });
 
@@ -87,7 +93,7 @@ export const createNotesService = ({
     }
 
     logger.info("Note updated", {
-      noteId: updatedNote.id,
+      noteId: id,
     });
 
     return updatedNote;

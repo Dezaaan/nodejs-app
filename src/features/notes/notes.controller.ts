@@ -95,10 +95,11 @@ export const createNotesController = ({
     response: Response,
   ): Promise<void> => {
     const { id } = noteIdParamsSchema.parse(request.params);
-    const input = updateNoteSchema.parse(request.body);
 
+    const input = updateNoteSchema.parse(request.body);
     const note = await notesService.updateNote(id, input);
-    response.status(201).json(mapNoteToResponseDto(note));
+
+    response.status(200).json(mapNoteToResponseDto(note));
   };
 
   const deleteNote = async (

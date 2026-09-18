@@ -102,4 +102,40 @@ describe("Notes API", () => {
 
     expect(response.body.error.code).toBe("NOT_FOUND");
   });
+
+  it("updates a note", async () => {
+    const created = await request(app).post("/api/notes").send({
+      title: "Original title",
+      content: "Original content",
+    });
+
+    const response = await request(app)
+      .patch(`/api/notes/${created.body.id}`)
+      .send({
+        title: "Updated title",
+      });
+
+    expect(response.status).toBe(200);
+
+    expect(response.body).toMatchObject({
+      id: created.body.id,
+      title: "Updated title",
+      content: "Original content",
+    });
+  });
+
+  it("deletes a note", async () => {
+    const created = await request(app).post("/api/notes").send({
+      title: "Delete me",
+      content: "Content",
+    });
+
+    const response = await request(app).delete(`/api/notes/${created.body.id}`);
+
+    expect(response.status).toBe(204);
+
+    const getResponse = await request(app).get(`/api/notes/${created.body.id}`);
+
+    expect(getResponse.status).toBe(404);
+  });
 });

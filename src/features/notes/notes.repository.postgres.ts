@@ -169,7 +169,7 @@ export const createPostgresNotesRepository = ({
 
     const row = result.rows[0];
 
-    return row ? mapNoteRow(row) : null;
+    return row ? mapNoteRowToDomain(row) : null;
   };
 
   const deleteById = async (id: string): Promise<boolean> => {
@@ -181,7 +181,7 @@ export const createPostgresNotesRepository = ({
       [id],
     );
 
-    return result.rowCount === 1;
+    return (result.rowCount ?? 0) > 0;
   };
 
   return {
