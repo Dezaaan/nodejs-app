@@ -4,7 +4,7 @@ import { Logger } from "../../infrastructure/createLogger.js";
 import { AppError } from "./AppError.js";
 
 export const createErrorMiddleware = (logger: Logger): ErrorRequestHandler => {
-  return (error, request, response, _next) => {
+  return (error, request, response) => {
     if (error instanceof AppError) {
       response.status(error.statusCode).json({
         error: {
@@ -20,8 +20,8 @@ export const createErrorMiddleware = (logger: Logger): ErrorRequestHandler => {
       response.status(400).json({
         error: {
           code: "VALIDATION_ERROR",
-          message: "Invalid request data",
           details: error.flatten(),
+          message: "Invalid request data",
         },
       });
 
@@ -29,9 +29,10 @@ export const createErrorMiddleware = (logger: Logger): ErrorRequestHandler => {
     }
 
     logger.error("Unhandled application error", {
+      error,
       method: request.method,
       path: request.originalUrl,
-      error,
+      requestId: response.locals.requestId,
     });
 
     response.status(500).json({

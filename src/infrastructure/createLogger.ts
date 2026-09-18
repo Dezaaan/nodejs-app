@@ -6,22 +6,46 @@ export type Logger = {
   error(message: string, metadata?: LogMetadata): void;
 };
 
-export const createLogger = (): Logger => {
-  const info = (message: string, metadata?: LogMetadata): void => {
-    console.log(message, metadata ?? {});
+type LogLevel = "info" | "warn" | "error";
+
+const log = (
+  level: LogLevel,
+  message: string,
+  metadata?: LogMetadata,
+): void => {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    level,
+    message,
+    ...metadata,
   };
 
-  const warn = (message: string, metadata?: LogMetadata): void => {
-    console.warn(message, metadata ?? {});
-  };
+  const serialized = JSON.stringify(entry);
 
-  const error = (message: string, metadata?: LogMetadata): void => {
-    console.error(message, metadata ?? {});
-  };
+  switch (level) {
+    case "error":
+      console.error(serialized);
+      break;
 
-  return {
-    info,
-    warn,
-    error,
-  };
+    case "warn":
+      console.warn(serialized);
+      break;
+
+    default:
+      console.log(serialized);
+  }
 };
+
+export const createLogger = (): Logger => ({
+  info: (message, metadata) => {
+    log("info", message, metadata);
+  },
+
+  warn: (message, metadata) => {
+    log("warn", message, metadata);
+  },
+
+  error: (message, metadata) => {
+    log("error", message, metadata);
+  },
+});

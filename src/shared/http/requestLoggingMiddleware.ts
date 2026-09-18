@@ -5,15 +5,17 @@ export const createRequestLoggingMiddleware = (
   logger: Logger,
 ): RequestHandler => {
   return (request, response, next) => {
-    const startedAt = Date.now();
+    const startedAt = performance.now();
 
     response.on("finish", () => {
+      const durationMs = performance.now() - startedAt;
+
       logger.info("HTTP request completed", {
         requestId: response.locals.requestId,
         method: request.method,
         path: request.originalUrl,
         statusCode: response.statusCode,
-        durationMs: Date.now() - startedAt,
+        durationMs: Math.round(durationMs),
       });
     });
 
