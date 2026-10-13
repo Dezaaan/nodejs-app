@@ -7,6 +7,7 @@ import { createRequestLoggingMiddleware } from "./shared/http/requestLoggingMidd
 import { createRoutes } from "./routes/createRoutes.js";
 import { notFoundMiddleware } from "./shared/errors/notFoundMiddleware.js";
 import { rateLimit } from "express-rate-limit";
+import { requestIdMiddleware } from "./shared/http/requestIdMiddleware.js";
 
 const apiRateLimiter = rateLimit({
   windowMs: 60_000,
@@ -21,6 +22,8 @@ export const createApp = (container: AppContainer) => {
   app.use(createRequestLoggingMiddleware(container.infrastructure.logger));
 
   app.use(helmet());
+
+  app.use(requestIdMiddleware);
 
   app.use(
     cors({

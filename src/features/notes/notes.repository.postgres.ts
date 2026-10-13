@@ -12,14 +12,6 @@ type CreatePostgresNotesRepositoryDependencies = {
   database: Database;
 };
 
-const mapNoteRow = (row: NoteRow): Note => ({
-  id: row.id,
-  title: row.title,
-  content: row.content,
-  createdAt: row.created_at,
-  updatedAt: row.updated_at,
-});
-
 const sortColumnMap = {
   createdAt: "created_at",
   updatedAt: "updated_at",
@@ -121,7 +113,7 @@ export const createPostgresNotesRepository = ({
 
     const row = result.rows[0];
 
-    return row ? mapNoteRow(row) : null;
+    return row ? mapNoteRowToDomain(row) : null;
   };
 
   const create = async (note: Note): Promise<Note> => {
@@ -145,7 +137,7 @@ export const createPostgresNotesRepository = ({
       [note.id, note.title, note.content, note.createdAt, note.updatedAt],
     );
 
-    return mapNoteRow(result.rows[0]!);
+    return mapNoteRowToDomain(result.rows[0]!);
   };
 
   const update = async (note: UpdateNoteData): Promise<Note | null> => {
